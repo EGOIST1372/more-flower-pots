@@ -2,7 +2,7 @@ package com.eternalhelldevs.moreflowerpots.blocks;
 
 import com.eternalhelldevs.moreflowerpots.properties.FlowerProperty;
 import com.eternalhelldevs.moreflowerpots.util.Flower;
-
+/*
 import net.minecraft.block.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
@@ -47,7 +47,7 @@ public class TemplatePotBlock extends Block {
             Block flower = state.get(TemplatePotBlock.FLOWER).getBlock();
             if (!player.isCreative() && !flower.equals(Blocks.AIR)) {
                 BlockPos playerPos = new BlockPos(player.getX(), player.getY(), player.getZ());
-                Block.dropStack(world, playerPos, new ItemStack(flower));
+                Block.dropStacks(world, playerPos, new ItemStack(flower));
             }
         }
     }
@@ -81,5 +81,107 @@ public class TemplatePotBlock extends Block {
             }
         }
         return ActionResult.SUCCESS;
+    }
+}
+*/
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.FlowerPotBlock;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.state.StateManager;
+import net.minecraft.state.property.EnumProperty;
+import net.minecraft.state.property.Properties;
+import net.minecraft.state.property.Property;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraft.stat.Stats;
+
+public class TemplatePotBlock extends Block {
+    // Example EnumProperty for custom flower logic.
+    public static final EnumProperty<FlowerType> FLOWER = EnumProperty.of("flower", FlowerType.class);
+
+    public TemplatePotBlock(Settings settings) {
+        super(settings);
+        this.setDefaultState(this.getStateManager().getDefaultState().with(FLOWER, FlowerType.NONE));
+    }
+
+    @Override
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(FLOWER);
+    }
+
+    @Override
+    public ActionResult onUse(BlockState state, World world, BlockPos pos,
+                             PlayerEntity player, Hand hand, BlockHitResult hit) {
+        ItemStack held = player.getStackInHand(hand);
+
+        FlowerType currentFlower = state.get(FLOWER);
+
+        // Placing a flower
+        if (currentFlower == FlowerType.NONE && held.getItem() instanceof BlockItem bi) {
+            Block block = bi.getBlock();
+            if (block.getDefaultState().isIn(BlockTags.FLOWERS)) {
+                if (!world.isClient) {
+                    // Set the block's flower property
+                    world.setBlockState(pos, state.with(FLOWER, FlowerType.fromBlock(block)), Block.NOTIFY_ALL);
+
+                    if (!player.getAbilities().creativeMode) {
+                        held.decrement(1);
+                    }
+                    // Modern vanilla stat handling: still valid for vanilla use
+                    player.incrementStat(Stats.USE_ITEM.get(bi.getItem()));
+                }
+                return ActionResult.success(world.isClient);
+            }
+        }
+        // Removing a flower
+        else if (currentFlower != FlowerType.NONE && held.isEmpty()) {
+            if (!world.isClient) {
+                ItemStack flowerStack = new ItemStack(currentFlower.getBlock().asItem());
+                // Offer to player inventory first. If full, drop
+                if (!player.getInventory().offerOrDrop(flowerStack)) {
+                    player.dropItem(flowerStack, false);
+                }
+                world.setBlockState(pos, state.with(FLOWER, FlowerType.NONE), Block.NOTIFY_ALL);
+            }
+            return ActionResult.success(world.isClient);
+        }
+
+        return ActionResult.PASS;
+    }
+    
+    // Example inner enum for demonstration; replace with your custom logic or Flower registry
+    public enum FlowerType {
+        NONE(Blocks.AIR),
+        DANDELION(Blocks.DANDELION),
+        POPPY(Blocks.POPPY),
+        // Add more types as needed
+
+        ;
+        private final Block block;
+
+        FlowerType(Block block) {
+            this.block = block;
+        }
+
+        public Block getBlock() {
+            return block;
+        }
+
+        public static FlowerType fromBlock(Block block) {
+            for (FlowerType type : values()) {
+                if (type.block == block) {
+                    return type;
+                }
+            }
+            return NONE;
+        }
     }
 }

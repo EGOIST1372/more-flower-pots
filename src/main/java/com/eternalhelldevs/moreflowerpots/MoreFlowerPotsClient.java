@@ -2,7 +2,8 @@ package com.eternalhelldevs.moreflowerpots;
 
 import com.eternalhelldevs.moreflowerpots.registry.RegistryHandler;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
+//import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
+import net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap;
 import net.minecraft.block.Block;
 import net.minecraft.client.render.RenderLayer;
 
@@ -16,7 +17,7 @@ public class MoreFlowerPotsClient implements ClientModInitializer {
 			try {
 				Object object = field.get(null);
 				if (object instanceof Block block) {
-					BlockRenderLayerMap.INSTANCE.putBlock(block, RenderLayer.getCutout());
+					BlockRenderLayerMap.putBlock(block, RenderLayer.getCutout());
 				}
 			} catch (IllegalAccessException e) {
 				e.printStackTrace();

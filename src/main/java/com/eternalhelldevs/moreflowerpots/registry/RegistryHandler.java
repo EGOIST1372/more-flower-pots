@@ -1,17 +1,21 @@
 package com.eternalhelldevs.moreflowerpots.registry;
 
+import java.util.function.Function;
 import com.eternalhelldevs.moreflowerpots.MoreFlowerPots;
 import com.eternalhelldevs.moreflowerpots.blocks.TemplatePotBlock;
 //import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 //import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-net.minecraft.block.AbstractBlock.Settings
+import net.minecraft.block.AbstractBlock.Settings
 import net.minecraft.block.Block;
+import net.minecraft.block.AbstractBlock;
 //import net.minecraft.block.Material;
 import net.minecraft.item.*;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 
 import java.lang.reflect.Field;
